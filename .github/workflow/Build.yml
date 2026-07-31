@@ -28,21 +28,25 @@ jobs:
             git
             unzip
 
-      - name: Unzip project
+      - name: Show files and Unzip
         run: |
-          unzip -o *.zip
+          echo "=== Current files ==="
           ls -la
+          echo "=== Unzipping ==="
+          unzip -o *.zip || 7z x *.zip
+          echo "=== After unzip ==="
+          ls -la
+          find . -name "CMakeLists.txt"
 
-      - name: Configure CMake
+      - name: Configure and Build
         run: |
-          cd crusader-automarket* || cd */
-          mkdir build
+          # پیدا کردن پوشه‌ای که CMakeLists.txt داره
+          PROJECT_DIR=$(find . -name "CMakeLists.txt" -exec dirname {} \; | head -n 1)
+          echo "Project directory is: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
+          mkdir -p build
           cd build
           cmake -G "MinGW Makefiles" ..
-
-      - name: Build
-        run: |
-          cd crusader-automarket*/build || cd */build
           mingw32-make
 
       - name: Upload dplayx.dll
@@ -50,3 +54,4 @@ jobs:
         with:
           name: dplayx-dll
           path: "**/dplayx.dll"
+          if-no-files-found: warn
