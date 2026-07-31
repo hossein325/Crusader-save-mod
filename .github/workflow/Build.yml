@@ -1,8 +1,6 @@
 name: Build dplayx.dll
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -13,45 +11,27 @@ jobs:
         shell: msys2 {0}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup MSYS2
-        uses: msys2/setup-msys2@v2
+      - uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW32
           update: true
-          install: >-
-            mingw-w64-i686-gcc
-            mingw-w64-i686-cmake
-            mingw-w64-i686-make
-            git
-            unzip
+          install: mingw-w64-i686-gcc mingw-w64-i686-cmake mingw-w64-i686-make unzip
 
-      - name: Show files and Unzip
+      - name: Unzip and Build
         run: |
-          echo "=== Current files ==="
+          unzip -o *.zip
           ls -la
-          echo "=== Unzipping ==="
-          unzip -o *.zip || 7z x *.zip
-          echo "=== After unzip ==="
+          cd */
           ls -la
-          find . -name "CMakeLists.txt"
-
-      - name: Configure and Build
-        run: |
-        
-          PROJECT_DIR=$(find . -name "CMakeLists.txt" -exec dirname {} \; | head -n 1)
-          echo "Project directory is: $PROJECT_DIR"
-          cd "$PROJECT_DIR"
-          mkdir -p build
+          mkdir build
           cd build
           cmake -G "MinGW Makefiles" ..
           mingw32-make
 
-      - name: Upload dplayx.dll
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: dplayx-dll
           path: "**/dplayx.dll"
-          if-no-files-found: warn
