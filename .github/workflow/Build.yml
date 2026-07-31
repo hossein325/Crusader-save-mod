@@ -40,7 +40,7 @@ jobs:
 
       - name: Configure and Build
         run: |
-          # پیدا کردن پوشه‌ای که CMakeLists.txt داره
+        
           PROJECT_DIR=$(find . -name "CMakeLists.txt" -exec dirname {} \; | head -n 1)
           echo "Project directory is: $PROJECT_DIR"
           cd "$PROJECT_DIR"
